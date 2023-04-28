@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="fast-classpath-scanner-2.0.11-javadoc">
+    <CLASSES />
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/../fast-classpath-scanner-2.0.11-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES />
+  </library>
+</component>
