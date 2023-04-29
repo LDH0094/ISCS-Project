@@ -18,7 +18,8 @@ public class DaoInvocationHandler implements InvocationHandler {
 		{
 			jdbc = new GhettoJdbcBlackBox();
 			jdbc.init("com.mysql.cj.jdbc.Driver", 				// DO NOT CHANGE
-					  "jdbc:mysql://localhost/jdbcblackbox",    // change jdbcblackbox to the DB name you wish to use
+					// made it name: ultimate group work.
+					  "jdbc:mysql://localhost/ultimategroupwork",    // change jdbcblackbox to the DB name you wish to use
 					  "root", 									// USER NAME
 					  "");										// PASSWORD
 		}
