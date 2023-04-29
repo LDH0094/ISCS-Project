@@ -4,10 +4,15 @@ import annotations.Column;
 import annotations.Entity;
 import annotations.MappedClass;
 import dao.BasicMapper;
+import dao.StudentMapper;
+import dao.SubjectMapper;
+import entity.Student;
+import entity.Subject;
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 import io.github.lukehutch.fastclasspathscanner.scanner.ScanResult;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.List;
 
@@ -107,17 +112,60 @@ public class MyORM
 	{
 		// create the proxy object for the mapper class supplied in clazz parameter
 		// all proxies will use the supplied DaoInvocationHandler as the InvocationHandler
+		DaoInvocationHandler daoInvocationHandler = new DaoInvocationHandler();
+		Object proxy;
 
-		return null;
+		if(entityToMapperMap.containsKey(clazz) && clazz == Student.class) {
+			StudentMapper studentProxy = (StudentMapper) Proxy.newProxyInstance(
+					ClassLoader.getSystemClassLoader(),
+					new Class[] {StudentMapper.class},
+					daoInvocationHandler
+			);
+			proxy = studentProxy;
+			return proxy;
+		} else if(entityToMapperMap.containsKey(clazz) && clazz == Subject.class) {
+			SubjectMapper subjectProxy = (SubjectMapper) Proxy.newProxyInstance(
+					ClassLoader.getSystemClassLoader(),
+					new Class[] {SubjectMapper.class},
+					daoInvocationHandler
+			);
+			proxy = subjectProxy;
+			return proxy;
+		} else {
+			throw new RuntimeException("clazz is not an entity class inside entityToMapperMap");
+		}
+		// return null deleted here (unreachable).
 	}
 	
 
-	private void createTables()
+	// ClassNotFoundException must be here included
+	private void createTables() throws ClassNotFoundException
 	{
+
+		ScanResult scanResult = new FastClasspathScanner("entity").scan();
+
+		List<String> results = scanResult.getNamesOfClassesWithAnnotation(MappedClass.class);
+
+		for (String result : results) {
+			Class aClass = Class.forName(result);
+			Entity entity = (Entity) aClass.getAnnotation(Entity.class);
+
+			if(entity.table().equals("student")) {
+				StudentMapper studentMapper = (StudentMapper) getMapper(aClass);
+				// run the createTable() method on each of the proxies
+				studentMapper.createTable();
+			} else if(entity.table().equals("subject")){
+				SubjectMapper subjectMapper = (SubjectMapper) getMapper(aClass);
+				// run the createTable() method on each of the proxies
+				subjectMapper.createTable();
+			} else {
+				throw new RuntimeException("No table associated in scanEntities() in MyORM");
+			}
+		}
 		// go through all the Mapper classes in the map
 			// create a proxy instance for each
 			// all these proxies can be casted to BasicMapper
-			// run the createTable() method on each of the proxies
+
 		
 	}
 
